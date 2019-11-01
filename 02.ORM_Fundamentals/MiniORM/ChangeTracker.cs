@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Reflection;
 
 namespace MiniORM
 {
@@ -48,15 +49,36 @@ namespace MiniORM
                 var entity = dbSet.Entities
                     .Single(e => GetPrimaryKeyValues(primaryKeys, e).SequenceEqual(primaryKeyValues));
 
-                var isModified = IsModified(proxyEntity, entity);
+                var isModified = IsModified(entity, proxyEntity);
 
                 if (isModified)
                 {
                     modifiedEntities.Add(entity);
                 }
 
-                return modifiedEntities;
+                
             }
+
+            return modifiedEntities;
+        }
+
+        private static IEnumerable<object> GetPrimaryKeyValues(IEnumerable<PropertyInfo> primaryKeys, T entity)
+        {
+            return primaryKeys.Select(pk => pk.GetValue(entity));
+        }
+
+        private static bool IsModified(T entity, T proxyEntity)
+        {
+            var monitoredProperties = typeof(T).GetProperties()
+                .Where(pi => DbContext.AllowedSqlTypes.Contains(pi.PropertyType));
+
+            var modifiedProperties = monitoredProperties
+                .Where(pi => !Equals(pi.GetValue(entity), pi.GetValue(proxyEntity)))
+                .ToArray();
+
+            var isModified = modifiedProperties.Any();
+
+            return isModified;
         }
 
         private static List<T> CloneEntities(IEnumerable<T> entities)
