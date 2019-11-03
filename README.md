@@ -7,4 +7,5 @@ My Homeworks for Entity Framework Core module at SoftUni
 Topics:
 	01. DB Apps Introduction - ADO.NET
 	02. ORM Fundamentals
+	03. Introduction to Entity Framework Core
 	
