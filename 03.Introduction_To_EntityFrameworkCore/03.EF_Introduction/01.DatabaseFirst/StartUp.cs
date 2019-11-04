@@ -2,6 +2,7 @@
 using System.Text;
 using SoftUni.Data;
 using System.Linq;
+using SoftUni.Models;
 
 
 namespace SoftUni
@@ -15,6 +16,43 @@ namespace SoftUni
             string result = GetEmployeesFromResearchAndDevelopment(context);
 
             Console.WriteLine(result);
+        }
+
+        //Problem 06
+        public static string AddNewAddressToEmployee(SoftUniContext context)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            Address address = new Address()
+            {
+                AddressText = "Vitoshka 15",
+                TownId = 4
+            };
+
+            Employee nakov = context
+                .Employees
+                .First(e => e.LastName == "Nakov");
+
+            nakov.Address = address;
+
+            context.SaveChanges();
+
+            var employees = context
+                .Employees
+                .OrderByDescending(e => e.AddressId)
+                .Take(10)
+                .Select(e => new
+                {
+                    e.Address.AddressText
+                });
+
+            foreach (var e in employees)
+            {
+                sb
+                    .AppendLine($"{e.AddressText}");
+            }
+
+            return sb.ToString().TrimEnd();
         }
 
         //Problem 05
