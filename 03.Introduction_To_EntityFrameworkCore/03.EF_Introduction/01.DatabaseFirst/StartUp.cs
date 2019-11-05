@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Text;
 using SoftUni.Data;
 using System.Linq;
@@ -13,9 +14,37 @@ namespace SoftUni
         {
             SoftUniContext context = new SoftUniContext();
 
-            string result = GetEmployeesInPeriod(context);
+            string result = GetLatestProjects(context);
 
             Console.WriteLine(result);
+        }
+
+        //Problem 11
+        public static string GetLatestProjects(SoftUniContext context)
+        {
+            StringBuilder sb = new StringBuilder();
+
+
+            var projects = context
+                .Projects
+                .OrderByDescending(p => p.StartDate)
+                .Take(10)
+                .Select(p => new
+                {
+                    p.Name,
+                    p.Description,
+                    startDate = p.StartDate.ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture)
+                })
+                .OrderBy(p => p.Name);
+
+            foreach (var p in projects)
+            {
+                sb.AppendLine(p.Name)
+                    .AppendLine(p.Description)
+                    .AppendLine(p.startDate);
+            }
+
+            return sb.ToString().TrimEnd();
         }
 
         //Problem 10
