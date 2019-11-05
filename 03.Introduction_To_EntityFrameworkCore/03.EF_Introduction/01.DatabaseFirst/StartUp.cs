@@ -13,9 +13,73 @@ namespace SoftUni
         {
             SoftUniContext context = new SoftUniContext();
 
-            string result = GetEmployeesFromResearchAndDevelopment(context);
+            string result = GetEmployeesInPeriod(context);
 
             Console.WriteLine(result);
+        }
+
+        //Problem 08
+        public static string GetAddressesByTown(SoftUniContext context)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            var addresses = context
+                .Addresses
+                .Select(a => new
+                {
+                    a.AddressText,
+                    townName = a.Town.Name,
+                    employeesCount = a.Employees.Count
+                })
+                .OrderByDescending(a => a.employeesCount)
+                .ThenBy(a => a.townName)
+                .ThenBy(a => a.AddressText)
+                .Take(10);
+
+            foreach (var a in addresses)
+            {
+                sb.AppendLine($"{a.AddressText}, {a.townName} - {a.employeesCount} employees");
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+
+        //Problem 07**
+        public static string GetEmployeesInPeriod(SoftUniContext context)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            var employees = context
+                .Employees
+                .Where(e => e.EmployeesProjects.Any(p => p.Project.StartDate.Year >= 2001))
+                .Where(e => e.EmployeesProjects.Any(p => p.Project.EndDate.Value.Year <= 2003))
+                .Take(10)
+                .Select(e => new
+                {
+                    e.FirstName,
+                    e.LastName,
+                    managerFirstName = e.Manager.FirstName,
+                    managerLastName = e.Manager.LastName,
+                    proj = e.EmployeesProjects.Select(p => new
+                    {
+                        projectName = p.Project.Name,
+                        startDate = p.Project.StartDate,
+                        endDate = p.Project.EndDate
+                    })
+                });
+
+            foreach (var e in employees)
+            {
+                sb.AppendLine($"{e.FirstName} {e.LastName} – Manager: {e.managerFirstName} {e.managerLastName} ");
+                foreach (var p in e.proj)
+                {
+                    string startDate = p.startDate.ToString(format: "M/d/yyyy h:mm:ss tt");
+                    string endDate = p.endDate != null ? p.endDate.Value.ToString(format: "M/d/yyyy h:mm:ss tt") : "not finished";
+                    sb.AppendLine($"--{p.projectName} - {startDate} - {endDate}");
+                }
+            }
+
+            return sb.ToString().TrimEnd();
         }
 
         //Problem 06
