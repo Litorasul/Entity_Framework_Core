@@ -18,6 +18,39 @@ namespace SoftUni
             Console.WriteLine(result);
         }
 
+        //Problem 09
+        public static string GetEmployee147(SoftUniContext context)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            var employee147 = context
+                .Employees
+                .Where(e => e.EmployeeId == 147)
+                .Select(e => new
+                {
+                    e.EmployeeId,
+                    e.FirstName,
+                    e.LastName,
+                    e.JobTitle,
+                    projects = e.EmployeesProjects
+                        .Select(p => new
+                        {
+                            projectName = p.Project.Name
+                        })
+                        .OrderBy(p => p.projectName)
+                })
+                .First();
+
+            sb.AppendLine($"{employee147.FirstName} {employee147.LastName} - {employee147.JobTitle}");
+
+            foreach (var e in employee147.projects)
+            {
+                sb.AppendLine($"{e.projectName}");
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+
         //Problem 08
         public static string GetAddressesByTown(SoftUniContext context)
         {
