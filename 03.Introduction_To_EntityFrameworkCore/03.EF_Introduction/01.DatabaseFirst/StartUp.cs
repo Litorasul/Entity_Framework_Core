@@ -19,6 +19,38 @@ namespace SoftUni
             Console.WriteLine(result);
         }
 
+        //Problem 12 
+        public static string IncreaseSalaries(SoftUniContext context)
+        {
+            var employees = context.Employees
+                .Where(e => e.Department.Name == "Engineering" || e.Department.Name == "Tool Design" ||
+                            e.Department.Name == "Marketing" || e.Department.Name == "Information Services");
+           
+
+            foreach (var employee in employees)
+            {
+                employee.Salary *= 1.12m;
+
+            }
+            context.SaveChanges();
+
+            var employeesToPrint = employees
+                .Select(e => new
+                {
+                    FullName = e.FirstName + " " + e.LastName,
+                    Salary = e.Salary
+                })
+                .OrderBy(e => e.FullName);
+
+            var sb = new StringBuilder();
+            foreach (var employee in employeesToPrint)
+            {
+                sb.AppendLine($"{employee.FullName} (${employee.Salary:F2})");
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+
         //Problem 11
         public static string GetLatestProjects(SoftUniContext context)
         {
@@ -163,7 +195,7 @@ namespace SoftUni
                     proj = e.EmployeesProjects.Select(p => new
                     {
                         projectName = p.Project.Name,
-                        startDate = p.Project.StartDate,
+                        startDate = p.Project.StartDate.ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture),
                         endDate = p.Project.EndDate
                     })
                 });
@@ -173,9 +205,11 @@ namespace SoftUni
                 sb.AppendLine($"{e.FirstName} {e.LastName} – Manager: {e.managerFirstName} {e.managerLastName} ");
                 foreach (var p in e.proj)
                 {
-                    string startDate = p.startDate.ToString(format: "M/d/yyyy h:mm:ss tt");
-                    string endDate = p.endDate != null ? p.endDate.Value.ToString(format: "M/d/yyyy h:mm:ss tt") : "not finished";
-                    sb.AppendLine($"--{p.projectName} - {startDate} - {endDate}");
+
+                    var endDate = p.endDate == null
+                        ? "not finished"
+                        : p.endDate.Value.ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
+                    sb.AppendLine($"--{p.projectName} - {p.startDate} - {endDate}");
                 }
             }
 
