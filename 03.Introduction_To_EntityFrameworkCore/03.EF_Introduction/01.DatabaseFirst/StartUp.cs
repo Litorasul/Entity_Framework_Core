@@ -19,6 +19,38 @@ namespace SoftUni
             Console.WriteLine(result);
         }
 
+        //Problem 15
+        public static string RemoveTown(SoftUniContext context)
+        {
+            var employees = context.Employees
+                .Where(e => e.Address.Town.Name == "Seattle")
+                .ToList();
+
+            foreach (var employee in employees)
+            {
+                employee.AddressId = null;
+            }
+
+            var addresses = context.Addresses
+                .Where(t => t.Town.Name == "Seattle");
+            int count = addresses.Count();
+
+            foreach (var address in addresses)
+            {
+                context.Addresses.Remove(address);
+            }
+
+            var towns = context.Towns
+                .Where(t => t.Name == "Seattle");
+            foreach (var town in towns)
+            {
+                context.Towns.Remove(town);
+            }
+
+            context.SaveChanges();
+            return $"{count} addresses in Seattle were deleted";
+        }
+
         //Problem 14
         public static string DeleteProjectById(SoftUniContext context)
         {
