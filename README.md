@@ -10,3 +10,4 @@ Topics:
 	02. ORM Fundamentals
 	03. Introduction to Entity Framework Core
 	04. Code First
+	05. Entity Relations
