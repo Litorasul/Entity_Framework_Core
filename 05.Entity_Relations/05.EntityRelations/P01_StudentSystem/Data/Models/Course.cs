@@ -24,7 +24,7 @@ namespace P01_StudentSystem.Data.Models
         [Required]
         public decimal Price { get; set; }
 
-        public ICollection<Student> Students { get; set; } = new HashSet<Student>();
+        public ICollection<StudentCourse> StudentsEnrolled { get; set; } = new HashSet<StudentCourse>();
 
         public ICollection<Homework> HomeworkSubmissions { get; set; } = new HashSet<Homework>();
 

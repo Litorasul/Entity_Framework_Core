@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using P01_StudentSystem.Data;
 
 namespace P01_StudentSystem
 {
@@ -6,7 +7,11 @@ namespace P01_StudentSystem
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            using(var db = new StudentSystemContext())
+            {
+                db.Database.Migrate();
+            }
+            
         }
     }
 }

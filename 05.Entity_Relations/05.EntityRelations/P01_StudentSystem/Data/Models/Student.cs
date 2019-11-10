@@ -12,14 +12,14 @@ namespace P01_StudentSystem.Data.Models
         [MaxLength(100)]
         public string Name { get; set; }
 
-        public int? PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; }
 
         [Required]
         public DateTime RegisteredOn { get; set; }
 
         public DateTime? Birthday { get; set; }
 
-        public ICollection<Course> CourseEnrollments { get; set; } = new HashSet<Course>();
+        public ICollection<StudentCourse> CourseEnrollments { get; set; } = new HashSet<StudentCourse>();
 
         public ICollection<Homework> HomeworkSubmissions { get; set; } = new HashSet<Homework>();
     }
