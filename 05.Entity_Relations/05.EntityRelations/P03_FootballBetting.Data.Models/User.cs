@@ -1,4 +1,6 @@
-﻿namespace P03_FootballBetting.Data.Models
+﻿using System.Collections.Generic;
+
+namespace P03_FootballBetting.Data.Models
 {
     public class User
     {
@@ -13,5 +15,7 @@
         public string Name { get; set; }
 
         public decimal Balance { get; set; }
+
+        public ICollection<Bet> Bets { get; set; } = new List<Bet>();
     }
 }

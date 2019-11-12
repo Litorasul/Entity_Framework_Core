@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace P03_FootballBetting.Data.Models
 {
@@ -7,9 +8,10 @@ namespace P03_FootballBetting.Data.Models
         public int GameId { get; set; }
 
         public int HomeTeamId { get; set; }
-        //nav
+        public Team HomeTeam { get; set; }
+
         public int AwayTeamId { get; set; }
-        //nav
+        public Team AwayTeam { get; set; }
 
         public int HomeTeamGoals { get; set; }
 
@@ -24,5 +26,10 @@ namespace P03_FootballBetting.Data.Models
         public double DrawBetRate { get; set; }
 
         public string Result { get; set; }
+
+        public ICollection<PlayerStatistic> PlayerStatistics { get; set; } 
+            = new List<PlayerStatistic>();
+
+        public ICollection<Bet> Bets { get; set; } = new List<Bet>();
     }
 }

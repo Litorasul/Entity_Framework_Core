@@ -1,4 +1,6 @@
 ﻿
+using System.Collections.Generic;
+
 namespace P03_FootballBetting.Data.Models
 {
     public class Team
@@ -14,12 +16,18 @@ namespace P03_FootballBetting.Data.Models
         public decimal Budget { get; set; }
 
         public int PrimaryKitColorId { get; set; }
-        //nav
+        public Color PrimaryKitColor { get; set; }
 
         public int SecondaryKitColorId { get; set; }
-        //nav
+        public Color SecondaryKitColor { get; set; }
 
         public int TownId { get; set; }
-        //nav
+        public Town Town { get; set; }
+
+        public ICollection<Game> HomeGames { get; set; } = new List<Game>();
+
+        public ICollection<Game> AwayGames { get; set; } = new List<Game>();
+
+        public ICollection<Player> Players { get; set; } = new List<Player>();
     }
 }

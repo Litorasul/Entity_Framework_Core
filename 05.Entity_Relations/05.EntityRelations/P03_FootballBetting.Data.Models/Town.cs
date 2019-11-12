@@ -1,4 +1,6 @@
-﻿namespace P03_FootballBetting.Data.Models
+﻿using System.Collections.Generic;
+
+namespace P03_FootballBetting.Data.Models
 {
     public class Town
     {
@@ -7,6 +9,8 @@
         public string Name { get; set; }
 
         public int CountryId { get; set; }
-        //nav
+        public Country Country { get; set; }
+
+        public ICollection<Team> Teams { get; set; } = new List<Team>();
     }
 }

@@ -19,9 +19,9 @@ namespace P03_FootballBetting.Data.Models
         public DateTime DateTime { get; set; }
 
         public int UserId { get; set; }
-        //nav
+        public User User { get; set; }
         public int GameId { get; set; }
-        //nav
 
+        public Game Game { get; set; }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace P03_FootballBetting.Data.Models
+﻿using System.Collections.Generic;
+
+namespace P03_FootballBetting.Data.Models
 {
     public class Player
     {
@@ -9,11 +11,15 @@
         public int SquadNumber { get; set; }
 
         public int TeamId { get; set; }
-        //nav
+
+        public Team Team { get; set; }
 
         public int PositionId { get; set; }
-        //nav
+
+        public Position Position { get; set; }
 
         public bool IsInjured { get; set; }
+
+        public ICollection<PlayerStatistic> PlayerStatistics { get; set; } = new List<PlayerStatistic>();
     }
 }
