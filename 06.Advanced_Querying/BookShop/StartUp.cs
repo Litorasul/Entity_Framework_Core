@@ -19,7 +19,7 @@ namespace BookShop
             {
                //DbInitializer.ResetDatabase(db);
 
-               Console.WriteLine(GetAuthorNamesEndingIn(db, "e"));
+               Console.WriteLine(GetBooksByAuthor(db, "R"));
             }
         }
 
@@ -175,7 +175,7 @@ namespace BookShop
 
             var authors = context
                 .Authors
-                .Where(a => a.FirstName.EndsWith(input.ToLower()))
+                .Where(a => a.FirstName.ToLower().EndsWith(input.ToLower()))
                 .Select(a => new
                 {
                     a.FirstName,
@@ -186,6 +186,51 @@ namespace BookShop
             foreach (var a in authors)
             {
                 sb.AppendLine($"{a.FirstName} {a.LastName}");
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+
+        //Problem 08 - 100%
+        public static string GetBookTitlesContaining(BookShopContext context, string input)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            var books = context
+                .Books
+                .Where(b => b.Title.ToLower().Contains(input.ToLower()))
+                .Select(b => new {b.Title})
+                .OrderBy(b  => b.Title)
+                .ToList();
+
+            foreach (var book in books)
+            {
+                sb.AppendLine(book.Title);
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+
+        //Problem 09 - 100%
+        public static string GetBooksByAuthor(BookShopContext context, string input)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            var books = context
+                .Books
+                .Where(b => b.Author.LastName.ToLower().StartsWith(input.ToLower()))
+                .Select(b => new
+                {
+                    b.BookId,
+                    b.Title,
+                    FullName = b.Author.FirstName +" "+ b.Author.LastName
+                })
+                .OrderBy(b => b.BookId)
+                .ToList();
+
+            foreach (var b in books)
+            {
+                sb.AppendLine($"{b.Title} ({b.FullName})");
             }
 
             return sb.ToString().TrimEnd();
