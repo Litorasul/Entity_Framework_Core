@@ -19,7 +19,7 @@ namespace BookShop
             {
                //DbInitializer.ResetDatabase(db);
 
-               Console.WriteLine(GetBooksByAuthor(db, "R"));
+               Console.WriteLine(GetTotalProfitByCategory(db));
             }
         }
 
@@ -234,6 +234,123 @@ namespace BookShop
             }
 
             return sb.ToString().TrimEnd();
+        }
+
+        //Problem 10 - 100%
+        public static int CountBooks(BookShopContext context, int lengthCheck)
+        {
+            int booksCount = context
+                .Books
+                .Count(b => b.Title.Length > lengthCheck);
+
+            return booksCount;
+        }
+
+        //Problem 11 - 100%
+        public static string CountCopiesByAuthor(BookShopContext context)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            var copies = context
+                .Authors
+                .Select(a => new
+                {
+                    Name = $"{a.FirstName} {a.LastName}",
+                    BookCopies = a.Books.Sum(b => b.Copies)
+                })
+                .OrderByDescending(a => a.BookCopies)
+                .ToList();
+
+            foreach (var a in copies)
+            {
+                sb.AppendLine($"{a.Name} - {a.BookCopies}");
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+
+        //Problem 12 - 100%
+        public static string GetTotalProfitByCategory(BookShopContext context)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            var categories = context
+                .Categories
+                .Select(c => new
+                {
+                    CategoryName = c.Name,
+                    TotalProfit = c.CategoryBooks.Sum(b => b.Book.Copies * b.Book.Price)
+                })
+                .OrderByDescending(c => c.TotalProfit)
+                .ThenBy(c => c.CategoryName)
+                .ToList();
+
+            foreach (var c in categories)
+            {
+                sb.AppendLine($"{c.CategoryName} ${c.TotalProfit:F2}");
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+
+        //Problem 13 - 100%
+        public static string GetMostRecentBooks(BookShopContext context)
+        {
+            var categoriestWithThreeMostRecentBooks = context.Categories
+                .Select(c => new
+                {
+                    CategoryName = c.Name,
+                    BooksCount = c.CategoryBooks.Sum(bc => bc.Book.BookId),
+                    Books = c.CategoryBooks.Select(bc => bc.Book).OrderByDescending(b => b.ReleaseDate).Take(3)
+                })
+                .OrderBy(c => c.CategoryName)
+                .ToArray();
+
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var cat in categoriestWithThreeMostRecentBooks)
+            {
+                sb.AppendLine($"--{cat.CategoryName}");
+
+                foreach (Book book in cat.Books)
+                {
+                    sb.AppendLine($"{book.Title} ({book.ReleaseDate.Value.Year})");
+                }
+            }
+
+            return sb.ToString().Trim();
+        }
+
+        //Problem 14 - 100%
+        public static void IncreasePrices(BookShopContext context)
+        {
+            const int ReleaseDate = 2010;
+            const decimal IncreaseValue = 5;
+
+            List<Book> booksWhichPriceWillBeIncreased = context.Books
+                .Where(b => b.ReleaseDate.Value.Year < ReleaseDate)
+                .ToList();
+
+            booksWhichPriceWillBeIncreased.ForEach(b => b.Price += IncreaseValue);
+
+            context.SaveChanges();
+        }
+
+        //Problem 15 - 100%
+        public static int RemoveBooks(BookShopContext context)
+        {
+            const int CopiesHighValue = 4200;
+
+            Book[] booksToBeRemoved = context.Books
+                .Where(b => b.Copies < CopiesHighValue)
+                .ToArray();
+
+            int booksToBeRemovedCount = booksToBeRemoved.Length;
+
+            context.Books.RemoveRange(booksToBeRemoved);
+            context.SaveChanges();
+
+            return booksToBeRemovedCount;
         }
     }
 }
