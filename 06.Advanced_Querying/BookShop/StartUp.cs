@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using BookShop.Models;
@@ -18,7 +19,7 @@ namespace BookShop
             {
                //DbInitializer.ResetDatabase(db);
 
-               Console.WriteLine(GetBooksNotReleasedIn(db, 1998));
+               Console.WriteLine(GetBooksReleasedBefore(db, "12-04-1992"));
             }
         }
 
@@ -137,6 +138,34 @@ namespace BookShop
                 .ToList();
 
             return String.Join(Environment.NewLine, books);
+        }
+
+        //Problem 06 - 100%
+        public static string GetBooksReleasedBefore(BookShopContext context, string date)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            DateTime dateTime = DateTime.ParseExact(date, "dd-MM-yyyy", null);
+
+            var books = context
+                .Books
+                .Where(b => b.ReleaseDate < dateTime)
+                .Select(b => new
+                {
+                    b.ReleaseDate,
+                    b.Title,
+                    b.EditionType,
+                    b.Price
+                })
+                .OrderByDescending(b => b.ReleaseDate)
+                .ToList();
+            foreach (var b in books)
+            {
+                sb.AppendLine($"{b.Title} - {b.EditionType} - ${b.Price:F2}");
+            }
+
+            return sb.ToString().TrimEnd();
+
         }
     }
 }
