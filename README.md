@@ -12,3 +12,4 @@ Topics:
 	04. Code First
 	05. Entity Relations
 	06. Advanced Querying
+	07. Auto Mapping Objects
