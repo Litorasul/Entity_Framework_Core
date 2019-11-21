@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using AutoMapper;
@@ -19,9 +20,9 @@ namespace CarDealer
                 //db.Database.EnsureDeleted();
                 //db.Database.EnsureCreated();
 
-                var inputJson = File.ReadAllText("./../../../Datasets/sales.json");
+                //var inputJson = File.ReadAllText("./../../../Datasets/sales.json");
 
-                var result = ImportSales(db, inputJson);
+                var result = GetOrderedCustomers(db);
 
                 Console.WriteLine(result);
 
@@ -113,6 +114,26 @@ namespace CarDealer
             context.SaveChanges();
 
             return $"Successfully imported {sales.Count}.";
+        }
+
+        //Problem 14 - 100%
+        public static string GetOrderedCustomers(CarDealerContext context)
+        {
+            var customers = context
+                .Customers
+                .OrderBy(c => c.BirthDate)
+                .ThenBy(c => c.IsYoungDriver)
+                .Select(c => new
+                {
+                    Name = c.Name,
+                    BirthDate = c.BirthDate.ToString("d", new CultureInfo("fr-FR")),
+                    IsYoungDriver = c.IsYoungDriver
+                })
+                .ToList();
+
+            var json = JsonConvert.SerializeObject(customers, Formatting.Indented);
+
+            return json;
         }
     }
 }
