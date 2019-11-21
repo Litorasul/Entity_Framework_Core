@@ -18,9 +18,10 @@ namespace ProductShop
                 //db.Database.EnsureCreated();
 
                 var inputJson = File
-                    .ReadAllText("./../../../Datasets/products.json");
+                    .ReadAllText("./../../../Datasets/categories.json");
 
-                var result = ImportProducts(db, inputJson);
+
+                var result = ImportCategories(db, inputJson);
 
                 Console.WriteLine(result);
             }
@@ -46,6 +47,19 @@ namespace ProductShop
             context.SaveChanges();
 
             return $"Successfully imported {products.Length}";
+        }
+
+        //Problem 03 - 100%
+        public static string ImportCategories(ProductShopContext context, string inputJson)
+        {
+
+            var categories = JsonConvert.DeserializeObject<Category[]>(inputJson)
+                .Where(c => c.Name != null).ToArray(); 
+
+            context.Categories.AddRange(categories);
+            context.SaveChanges();
+
+            return $"Successfully imported {categories.Length}";
         }
     }
 }
