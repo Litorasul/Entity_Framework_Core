@@ -22,7 +22,7 @@ namespace CarDealer
 
                 //var inputJson = File.ReadAllText("./../../../Datasets/sales.json");
 
-                var result = GetOrderedCustomers(db);
+                var result = GetCarsFromMakeToyota(db);
 
                 Console.WriteLine(result);
 
@@ -132,6 +132,28 @@ namespace CarDealer
                 .ToList();
 
             var json = JsonConvert.SerializeObject(customers, Formatting.Indented);
+
+            return json;
+        }
+
+        //Problem 15 - 100%
+        public static string GetCarsFromMakeToyota(CarDealerContext context)
+        {
+            var toyotas = context
+                .Cars
+                .Where(t => t.Make == "Toyota")
+                .OrderBy(t => t.Model)
+                .ThenByDescending(t => t.TravelledDistance)
+                .Select(t => new
+                {
+                    t.Id,
+                    t.Make,
+                    t.Model,
+                    t.TravelledDistance
+                })
+                .ToList();
+
+            var json = JsonConvert.SerializeObject(toyotas, Formatting.Indented);
 
             return json;
         }
