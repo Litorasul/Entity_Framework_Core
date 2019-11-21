@@ -21,7 +21,7 @@ namespace ProductShop
                 //    .ReadAllText("./../../../Datasets/categories-products.json");
 
 
-                var result = GetProductsInRange(db);
+                var result = GetSoldProducts(db);
 
                 Console.WriteLine(result);
             }
@@ -89,6 +89,35 @@ namespace ProductShop
                 .ToList();
 
             var json = JsonConvert.SerializeObject(products, Formatting.Indented);
+
+            return json;
+        }
+
+        //Problem 06 - 100%
+        public static string GetSoldProducts(ProductShopContext context)
+        {
+            var users = context
+                .Users
+                .Where(u => u.ProductsSold.Where(ps => ps.Buyer != null).Count() >= 1)
+                .OrderBy(u => u.LastName)
+                .ThenBy(u => u.FirstName)
+                .Select(u => new
+                {
+                    firstName = u.FirstName,
+                    lastName = u.LastName,
+                    soldProducts = u.ProductsSold
+                        .Where(p => p.Buyer != null)
+                        .Select(p => new
+                    {
+                        name = p.Name,
+                        price = p.Price,
+                        buyerFirstName = p.Buyer.FirstName,
+                        buyerLastName = p.Buyer.LastName
+                    })
+                })
+                .ToList();
+
+            var json = JsonConvert.SerializeObject(users, Formatting.Indented);
 
             return json;
         }
