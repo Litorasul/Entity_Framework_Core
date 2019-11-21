@@ -22,7 +22,7 @@ namespace CarDealer
 
                 //var inputJson = File.ReadAllText("./../../../Datasets/sales.json");
 
-                var result = GetTotalSalesByCustomer(db);
+                var result = GetSalesWithAppliedDiscount(db);
 
                 Console.WriteLine(result);
 
@@ -221,6 +221,35 @@ namespace CarDealer
                 .ToList();
 
             var json = JsonConvert.SerializeObject(customers, Formatting.Indented);
+            return json;
+        }
+
+        //problem 19 - 100%
+        public static string GetSalesWithAppliedDiscount(CarDealerContext context)
+        {
+            var sales = context
+                .Sales
+                .Select(s => new
+                {
+                    car = new
+                    {
+                        s.Car.Make,
+                        s.Car.Model,
+                        s.Car.TravelledDistance
+                    },
+                    customerName = s.Customer.Name,
+                    Discount = $"{s.Discount:F2}",
+                    price = $"{s.Car.PartCars.Sum(pc => pc.Part.Price):F2}",
+
+                    priceWithDiscount = $@"{(s.Car.PartCars.Sum(p => p.Part.Price) -
+                                             s.Car.PartCars.Sum(p => p.Part.Price) * s.Discount / 100):F2}"
+                })
+                .Take(10)
+                .ToList();
+
+
+            var json = JsonConvert.SerializeObject(sales, Formatting.Indented);
+
             return json;
         }
     }
