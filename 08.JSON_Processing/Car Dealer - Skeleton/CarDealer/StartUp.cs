@@ -19,9 +19,9 @@ namespace CarDealer
                 //db.Database.EnsureDeleted();
                 //db.Database.EnsureCreated();
 
-                var inputJson = File.ReadAllText("./../../../Datasets/cars.json");
+                var inputJson = File.ReadAllText("./../../../Datasets/customers.json");
 
-                var result = ImportCars(db, inputJson);
+                var result = ImportCustomers(db, inputJson);
 
                 Console.WriteLine(result);
 
@@ -90,6 +90,18 @@ namespace CarDealer
 
             return $"Successfully imported {carsToImport.Count}.";
 
+        }
+
+        //Problem 12 - 100%
+        public static string ImportCustomers(CarDealerContext context, string inputJson)
+        {
+
+            var customers = JsonConvert.DeserializeObject<List<Customer>>(inputJson);
+
+            context.Customers.AddRange(customers);
+            context.SaveChanges();
+
+            return $"Successfully imported {customers.Count}.";
         }
     }
 }
