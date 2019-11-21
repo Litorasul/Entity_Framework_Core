@@ -18,9 +18,9 @@ namespace CarDealer
                 //db.Database.EnsureDeleted();
                 //db.Database.EnsureCreated();
 
-                var inputJson = File.ReadAllText("./../../../Datasets/suppliers.json");
+                var inputJson = File.ReadAllText("./../../../Datasets/parts.json");
 
-                var result = ImportSuppliers(db, inputJson);
+                var result = ImportParts(db, inputJson);
 
                 Console.WriteLine(result);
 
@@ -39,6 +39,16 @@ namespace CarDealer
             return $"Successfully imported {suppliers.Count}.";
         }
 
+        //Problem 10 - 100%
+        public static string ImportParts(CarDealerContext context, string inputJson)
+        {
 
+            var parts = JsonConvert.DeserializeObject<List<Part>>(inputJson).Where(p => p.SupplierId <= 31).ToList();
+
+            context.Parts.AddRange(parts);
+            context.SaveChanges();
+
+            return $"Successfully imported {parts.Count}.";
+        }
     }
 }
