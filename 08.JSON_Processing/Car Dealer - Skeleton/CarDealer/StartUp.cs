@@ -22,7 +22,7 @@ namespace CarDealer
 
                 //var inputJson = File.ReadAllText("./../../../Datasets/sales.json");
 
-                var result = GetLocalSuppliers(db);
+                var result = GetCarsWithTheirListOfParts(db);
 
                 Console.WriteLine(result);
 
@@ -173,6 +173,33 @@ namespace CarDealer
                 .ToList();
 
             var json = JsonConvert.SerializeObject(suppliers, Formatting.Indented);
+
+            return json;
+        }
+
+        //Problem 17 - 100%
+        public static string GetCarsWithTheirListOfParts(CarDealerContext context)
+        {
+            var cars = context
+                .Cars
+                .Select(c => new
+                {
+                    car = new
+                    {
+                        c.Make,
+                        c.Model,
+                        c.TravelledDistance
+                    },
+                    parts = c.PartCars.Select(p => new
+                    {
+                        p.Part.Name,
+                        Price = $"{p.Part.Price:F2}"
+                    })
+
+                })
+                .ToList();
+
+            var json = JsonConvert.SerializeObject(cars, Formatting.Indented);
 
             return json;
         }
