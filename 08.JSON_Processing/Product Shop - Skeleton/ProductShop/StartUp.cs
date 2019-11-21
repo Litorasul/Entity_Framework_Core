@@ -21,7 +21,7 @@ namespace ProductShop
                 //    .ReadAllText("./../../../Datasets/categories-products.json");
 
 
-                var result = GetCategoriesByProductsCount(db);
+                var result = GetUsersWithProducts(db);
 
                 Console.WriteLine(result);
             }
@@ -140,6 +140,52 @@ namespace ProductShop
             var json = JsonConvert.SerializeObject(categories, Formatting.Indented);
 
             return json;
+        }
+
+        //Problem 08 - 100%
+        public static string GetUsersWithProducts(ProductShopContext context)
+        {
+            var users = context
+                .Users
+                .Where(u => u.ProductsSold.Any(p => p.Buyer != null))
+                .Select(u => new
+                {
+                    firstName = u.FirstName,
+                    lastName = u.LastName,
+                    age = u.Age,
+                    soldProducts = new
+                    {
+                        count = u.ProductsSold
+                            .Where(p => p.Buyer != null)
+                            .Count(),
+                        products = u.ProductsSold
+                            .Where(p => p.Buyer != null)
+                            .Select(p => new
+                            {
+                                name = p.Name,
+                                price = p.Price
+                            })
+                    }
+                })
+                .OrderByDescending(u => u.soldProducts.count)
+                .ToList();
+
+            var userOutput = new
+            {
+                usersCount = users.Count,
+                users = users
+            };
+
+            var settings = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                Formatting = Formatting.Indented
+            };
+
+            var json = JsonConvert.SerializeObject(userOutput, settings);
+
+            return json;
+
         }
     }
 }
