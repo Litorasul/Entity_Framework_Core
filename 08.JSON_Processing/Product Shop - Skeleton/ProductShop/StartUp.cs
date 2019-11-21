@@ -21,7 +21,7 @@ namespace ProductShop
                 //    .ReadAllText("./../../../Datasets/categories-products.json");
 
 
-                var result = GetSoldProducts(db);
+                var result = GetCategoriesByProductsCount(db);
 
                 Console.WriteLine(result);
             }
@@ -118,6 +118,26 @@ namespace ProductShop
                 .ToList();
 
             var json = JsonConvert.SerializeObject(users, Formatting.Indented);
+
+            return json;
+        }
+
+        //Problem 07 - 100%
+        public static string GetCategoriesByProductsCount(ProductShopContext context)
+        {
+            var categories = context
+                .Categories
+                .OrderByDescending(c => c.CategoryProducts.Count)
+                .Select(c => new
+                {
+                    category = c.Name,
+                    productsCount = c.CategoryProducts.Count,
+                    averagePrice = $"{c.CategoryProducts.Average(d => d.Product.Price):F2}",
+                    totalRevenue = $"{c.CategoryProducts.Sum(d => d.Product.Price):F2}"
+                })
+                .ToList();
+
+            var json = JsonConvert.SerializeObject(categories, Formatting.Indented);
 
             return json;
         }
