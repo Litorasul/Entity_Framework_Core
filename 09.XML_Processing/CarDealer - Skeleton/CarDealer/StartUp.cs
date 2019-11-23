@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Xml.Serialization;
 using AutoMapper;
 using CarDealer.Data;
@@ -19,9 +20,9 @@ namespace CarDealer
                 //db.Database.EnsureDeleted();
                 //db.Database.EnsureCreated();
 
-                var inputXml = File.ReadAllText("./../../../Datasets/suppliers.xml");
+                var inputXml = File.ReadAllText("./../../../Datasets/parts.xml");
 
-                var result = ImportSuppliers(db, inputXml);
+                var result = ImportParts(db, inputXml);
 
                 Console.WriteLine(result);
             }
@@ -48,5 +49,29 @@ namespace CarDealer
             return $"Successfully imported {suppliers.Length}";
         }
 
+        //Problem 10 - 100%
+        public static string ImportParts(CarDealerContext context, string inputXml)
+        {
+            var xmlSerializer = new XmlSerializer(typeof(ImportPartsDto[]),
+                new XmlRootAttribute("Parts"));
+
+            ImportPartsDto[] partsDtos;
+
+            using (var reader = new StringReader(inputXml))
+            {
+                partsDtos = ((ImportPartsDto[]) xmlSerializer
+                    .Deserialize(reader))
+                    .Where(p => context.Suppliers.Any(s => s.Id == p.SupplierId))
+                    .ToArray();
+            }
+
+            var parts = Mapper.Map<Part[]>(partsDtos);
+
+            context.Parts.AddRange(parts);
+            context.SaveChanges();
+
+            return $"Successfully imported {parts.Length}";
+        }
     }
+
 }
