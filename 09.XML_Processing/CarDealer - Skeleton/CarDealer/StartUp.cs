@@ -21,9 +21,9 @@ namespace CarDealer
                 //db.Database.EnsureDeleted();
                 //db.Database.EnsureCreated();
 
-                var inputXml = File.ReadAllText("./../../../Datasets/customers.xml");
+                var inputXml = File.ReadAllText("./../../../Datasets/sales.xml");
 
-                var result = ImportCustomers(db, inputXml);
+                var result = ImportSales(db, inputXml);
 
                 Console.WriteLine(result);
             }
@@ -145,6 +145,29 @@ namespace CarDealer
             context.SaveChanges();
 
             return $"Successfully imported {customers.Length}";
+        }
+
+        //Problem 13 - 100%
+        public static string ImportSales(CarDealerContext context, string inputXml)
+        {
+            var xmlSerializer = new XmlSerializer(typeof(ImportSalesDto[]),
+                new XmlRootAttribute("Sales"));
+
+            ImportSalesDto[] salesDtos;
+
+            using (var reader = new StringReader(inputXml))
+            {
+                salesDtos = ((ImportSalesDto[]) xmlSerializer.Deserialize(reader))
+                    .Where(s => context.Cars.Any(c => c.Id == s.CarId))
+                    .ToArray();
+            }
+
+            var sales = Mapper.Map<Sale[]>(salesDtos);
+
+            context.Sales.AddRange(sales);
+            context.SaveChanges();
+
+            return $"Successfully imported {sales.Length}";
         }
     }
 
