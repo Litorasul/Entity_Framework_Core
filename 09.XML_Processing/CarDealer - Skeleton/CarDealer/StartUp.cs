@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
@@ -20,9 +21,9 @@ namespace CarDealer
                 //db.Database.EnsureDeleted();
                 //db.Database.EnsureCreated();
 
-                var inputXml = File.ReadAllText("./../../../Datasets/parts.xml");
+                var inputXml = File.ReadAllText("./../../../Datasets/cars.xml");
 
-                var result = ImportParts(db, inputXml);
+                var result = ImportCars(db, inputXml);
 
                 Console.WriteLine(result);
             }
@@ -71,6 +72,58 @@ namespace CarDealer
             context.SaveChanges();
 
             return $"Successfully imported {parts.Length}";
+        }
+
+        //Problem 11 - 100%
+        public static string ImportCars(CarDealerContext context, string inputXml)
+        {
+            var xmlSerializer = new XmlSerializer(typeof(ImportCarDto[]),
+                new XmlRootAttribute("Cars"));
+
+            ImportCarDto[] carDtos;
+
+            using (var reader = new StringReader(inputXml))
+            {
+                carDtos = (ImportCarDto[]) xmlSerializer.Deserialize(reader);
+            }
+
+            List<Car> cars = new List<Car>();
+            List<PartCar> partsCars = new List<PartCar>();
+
+            foreach (var carDto in carDtos)
+            {
+                var car = new Car()
+                {
+                    Make = carDto.Make,
+                    Model = carDto.Model,
+                    TravelledDistance = carDto.TravelledDistance
+                };
+
+                var parts = carDto
+                    .Parts
+                    .Where(pc => context.Parts.Any(p => p.Id == pc.Id))
+                    .Select(p => p.Id)
+                    .Distinct();
+
+                foreach (var partId in parts)
+                {
+                    var partCar = new PartCar()
+                    {
+                        PartId = partId,
+                        Car = car
+                    };
+
+                    partsCars.Add(partCar);
+                }
+
+                cars.Add(car);
+            }
+
+            context.Cars.AddRange(cars);
+            context.PartCars.AddRange(partsCars);
+            context.SaveChanges();
+
+            return $"Successfully imported {cars.Count}";
         }
     }
 
