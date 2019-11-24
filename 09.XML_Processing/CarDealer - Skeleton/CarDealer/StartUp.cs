@@ -2,11 +2,17 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Xml.Serialization;
-using AutoMapper;
+
 using CarDealer.Data;
-using CarDealer.Dtos.Import;
 using CarDealer.Models;
+using CarDealer.Dtos.Import;
+using CarDealer.Dtos.Export;
+
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
+
 
 namespace CarDealer
 {
@@ -21,9 +27,9 @@ namespace CarDealer
                 //db.Database.EnsureDeleted();
                 //db.Database.EnsureCreated();
 
-                var inputXml = File.ReadAllText("./../../../Datasets/sales.xml");
+                //var inputXml = File.ReadAllText("./../../../Datasets/sales.xml");
 
-                var result = ImportSales(db, inputXml);
+                var result = GetLocalSuppliers(db);
 
                 Console.WriteLine(result);
             }
@@ -61,7 +67,7 @@ namespace CarDealer
             using (var reader = new StringReader(inputXml))
             {
                 partsDtos = ((ImportPartsDto[]) xmlSerializer
-                    .Deserialize(reader))
+                        .Deserialize(reader))
                     .Where(p => context.Suppliers.Any(s => s.Id == p.SupplierId))
                     .ToArray();
             }
@@ -169,6 +175,32 @@ namespace CarDealer
 
             return $"Successfully imported {sales.Length}";
         }
-    }
 
+
+
+        //Problem 16 - 100%
+        public static string GetLocalSuppliers(CarDealerContext context)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            var suppliers = context
+                .Suppliers
+                .Where(s => !s.IsImporter)
+                .ProjectTo<ExportLocalSuppliersDto>()
+                .ToArray();
+
+            var xmlSerializer = new XmlSerializer(typeof(ExportLocalSuppliersDto[]),
+                new XmlRootAttribute("suppliers"));
+
+            var nameSpaces = new XmlSerializerNamespaces();
+            nameSpaces.Add("", "");
+
+            using (var writer = new StringWriter(sb))
+            {
+                xmlSerializer.Serialize(writer, suppliers, nameSpaces);
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+    }
 }
