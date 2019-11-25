@@ -29,7 +29,7 @@ namespace CarDealer
 
                 //var inputXml = File.ReadAllText("./../../../Datasets/sales.xml");
 
-                var result = GetLocalSuppliers(db);
+                var result = GetCarsWithTheirListOfParts(db);
 
                 Console.WriteLine(result);
             }
@@ -189,6 +189,7 @@ namespace CarDealer
                 .ProjectTo<ExportLocalSuppliersDto>()
                 .ToArray();
 
+
             var xmlSerializer = new XmlSerializer(typeof(ExportLocalSuppliersDto[]),
                 new XmlRootAttribute("suppliers"));
 
@@ -198,6 +199,41 @@ namespace CarDealer
             using (var writer = new StringWriter(sb))
             {
                 xmlSerializer.Serialize(writer, suppliers, nameSpaces);
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+
+
+        //Problem 17 - 100%
+        public static string GetCarsWithTheirListOfParts(CarDealerContext context)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            var cars = context
+                .Cars
+                .OrderByDescending(c => c.TravelledDistance)
+                .ThenBy(c => c.Model)
+                .Take(5)
+                .ProjectTo<ExportCarDto>()
+                .ToArray();
+
+            foreach (var car in cars)
+            {
+                car.Parts = car.Parts
+                    .OrderByDescending(p => p.Price)
+                    .ToArray();
+            }
+
+            var xmlSerializer = new XmlSerializer(typeof(ExportCarDto[]),
+                new XmlRootAttribute("cars"));
+
+            var nameSpaces = new XmlSerializerNamespaces();
+            nameSpaces.Add("", "");
+
+            using (var writer = new StringWriter(sb))
+            {
+                xmlSerializer.Serialize(writer, cars, nameSpaces);
             }
 
             return sb.ToString().TrimEnd();

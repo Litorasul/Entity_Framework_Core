@@ -1,4 +1,6 @@
-﻿using CarDealer.Models;
+﻿using System.Linq;
+
+using CarDealer.Models;
 using CarDealer.Dtos.Export;
 using CarDealer.Dtos.Import;
 
@@ -20,6 +22,12 @@ namespace CarDealer
             this.CreateMap<ImportSalesDto, Sale>();
 
             this.CreateMap<Supplier, ExportLocalSuppliersDto>();
+
+            this.CreateMap<Part, ExportCarPartDto>();
+
+            this.CreateMap<Car, ExportCarDto>()
+                .ForMember(x => x.Parts,
+                    y => y.MapFrom(x => x.PartCars.Select(pc => pc.Part)));
         }
     }
 }
