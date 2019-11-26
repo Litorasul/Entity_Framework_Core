@@ -21,9 +21,13 @@ namespace CarDealer
 
             this.CreateMap<ImportSalesDto, Sale>();
 
+            this.CreateMap<Car, ExportCarsWithDistanceDto>();
+
             this.CreateMap<Supplier, ExportLocalSuppliersDto>();
 
             this.CreateMap<Part, ExportCarPartDto>();
+
+
 
             this.CreateMap<Car, ExportCarDto>()
                 .ForMember(x => x.Parts,

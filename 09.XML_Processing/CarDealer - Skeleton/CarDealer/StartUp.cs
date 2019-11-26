@@ -12,7 +12,7 @@ using CarDealer.Dtos.Export;
 
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
-
+using System.Xml;
 
 namespace CarDealer
 {
@@ -29,7 +29,7 @@ namespace CarDealer
 
                 //var inputXml = File.ReadAllText("./../../../Datasets/sales.xml");
 
-                var result = GetCarsWithTheirListOfParts(db);
+                var result = GetCarsWithDistance(db);
 
                 Console.WriteLine(result);
             }
@@ -176,7 +176,31 @@ namespace CarDealer
             return $"Successfully imported {sales.Length}";
         }
 
+        //Problem 14 - 100%
+        public static string GetCarsWithDistance(CarDealerContext context)
+        {
+            var cars = context.Cars
+                .Where(c => c.TravelledDistance > 2000000)
+                .Select(c => new ExportCarsWithDistanceDto
+                {
+                    Make = c.Make,
+                    Model = c.Model,
+                    TravelledDistance = c.TravelledDistance
+                })
+                .OrderBy(c => c.Make)
+                .ThenBy(c => c.Model)
+                .Take(10)
+                .ToArray();
 
+            var xmlSerializer = new XmlSerializer(typeof(ExportCarsWithDistanceDto[]), new XmlRootAttribute("cars"));
+
+            var sb = new StringBuilder();
+            var namespaces = new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty });
+            xmlSerializer.Serialize(new StringWriter(sb), cars, namespaces);
+
+            return sb.ToString().TrimEnd();
+
+        }
 
         //Problem 16 - 100%
         public static string GetLocalSuppliers(CarDealerContext context)
