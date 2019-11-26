@@ -29,7 +29,7 @@ namespace CarDealer
 
                 //var inputXml = File.ReadAllText("./../../../Datasets/sales.xml");
 
-                var result = GetCarsWithDistance(db);
+                var result = GetCarsFromMakeBmw(db);
 
                 Console.WriteLine(result);
             }
@@ -200,6 +200,38 @@ namespace CarDealer
 
             return sb.ToString().TrimEnd();
 
+        }
+
+        //Problem 15 - 100%
+        public static string GetCarsFromMakeBmw(CarDealerContext context)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            var bmws = context
+                .Cars
+                .Where(c => c.Make == "BMW")
+                .Select(c => new ExportBMWDto
+                {
+                    Id = c.Id,
+                    Model = c.Model,
+                    TravelledDistance = c.TravelledDistance
+                })
+                .OrderBy(c => c.Model)
+                .ThenByDescending(c => c.TravelledDistance)
+                .ToArray();
+
+            var xmlSerializer = new XmlSerializer(typeof(ExportBMWDto[]),
+                new XmlRootAttribute("cars"));
+
+            var nameSpaces = new XmlSerializerNamespaces();
+            nameSpaces.Add("", "");
+
+            using (var writer = new StringWriter(sb))
+            {
+                xmlSerializer.Serialize(writer, bmws, nameSpaces);
+            }
+
+            return sb.ToString().TrimEnd();
         }
 
         //Problem 16 - 100%
