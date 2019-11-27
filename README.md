@@ -15,3 +15,4 @@ Topics:
 	07. Auto Mapping Objects
 	08. JSON Processing
 	09. XML Processing
+	10. Design Patterns
