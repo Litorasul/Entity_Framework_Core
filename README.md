@@ -16,3 +16,4 @@ Topics:
 	08. JSON Processing
 	09. XML Processing
 	10. Design Patterns
+	11. Best Practices and Architecture
