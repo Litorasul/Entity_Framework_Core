@@ -17,3 +17,4 @@ Topics:
 	09. XML Processing
 	10. Design Patterns
 	11. Best Practices and Architecture
+	12. Workshop - ASP.NET Core
