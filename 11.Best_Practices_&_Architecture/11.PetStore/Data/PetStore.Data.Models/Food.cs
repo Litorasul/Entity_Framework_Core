@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
+using static PetStore.Data.Models.DataValidation;
 
 namespace PetStore.Data.Models
 {
@@ -7,6 +10,8 @@ namespace PetStore.Data.Models
     {
         public int Id { get; set; }
 
+        [Required]
+        [MaxLength(NameMaxLength)]
         public string Name { get; set; }
 
         //in Kilograms
