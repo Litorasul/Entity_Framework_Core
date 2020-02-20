@@ -1,4 +1,5 @@
 ﻿using System;
+using PetStore.Data;
 
 namespace _11.PetStore
 {
@@ -6,7 +7,6 @@ namespace _11.PetStore
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
         }
     }
 }
